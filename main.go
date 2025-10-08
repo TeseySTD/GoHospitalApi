@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/TeseySTD/GoHospitalApi/handlers"
 	"github.com/TeseySTD/GoHospitalApi/middleware"
@@ -10,9 +13,26 @@ import (
 )
 
 func main() {
-	if err := storage.Store.LoadFromFile(); err != nil {
-		log.Println("Creating new storage file...")
+	ctx := context.Background()
+
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		dsn = "postgres://postgres:postgres@localhost:5400/hospitaldb"
 	}
+
+	pool, err := storage.ConnectPool(ctx, dsn)
+	if err != nil {
+		log.Fatalf("failed to connect to db: %v", err)
+	}
+	defer pool.Close()
+
+	st := storage.New(pool)
+	storage.Store = st
+
+	if err := st.Migrate(ctx); err != nil {
+		log.Fatalf("migrate failed: %v", err)
+	}
+	log.Println("Database migrated/ready")
 
 	http.HandleFunc("/patients", middleware.Chain(
 		handlers.PatientsRouter,
@@ -53,5 +73,11 @@ func main() {
 	log.Printf("Server starting on port %s", port)
 	log.Printf("API Key for authorization: %s", middleware.ValidAPIKey)
 
-	log.Fatal(http.ListenAndServe(port, nil))
+	srv := &http.Server{
+		Addr:         port,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	log.Fatal(srv.ListenAndServe())
 }

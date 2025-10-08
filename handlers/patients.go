@@ -2,133 +2,137 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/TeseySTD/GoHospitalApi/models"
-	"github.com/TeseySTD/GoHospitalApi/storage"
-	"github.com/TeseySTD/GoHospitalApi/utils"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/TeseySTD/GoHospitalApi/models"
+	"github.com/TeseySTD/GoHospitalApi/storage"
+	"github.com/TeseySTD/GoHospitalApi/utils"
 )
 
 func GetPatientsHandler(w http.ResponseWriter, r *http.Request) {
-	storage.Store.RLock()
-	defer storage.Store.RUnlock()
-	
-	query := r.URL.Query()
-	firstName := query.Get("first_name")
-	lastName := query.Get("last_name")
-	ageStr := query.Get("age")
-	diagnosis := query.Get("diagnosis")
-	
-	if firstName == "" && lastName == "" && ageStr == "" && diagnosis == "" {
-		utils.RespondJSON(w, http.StatusOK, storage.Store.Patients)
+	ctx := r.Context()
+
+	patients, err := storage.Store.GetAllPatients(ctx)
+	if err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "failed to fetch patients: "+err.Error())
 		return
 	}
-	
-	var filteredPatients []models.Patient
-	
-	for _, patient := range storage.Store.Patients {
+
+	query := r.URL.Query()
+	firstName := strings.ToLower(query.Get("first_name"))
+	lastName := strings.ToLower(query.Get("last_name"))
+	ageStr := query.Get("age")
+	diagnosis := strings.ToLower(query.Get("diagnosis"))
+
+	if firstName == "" && lastName == "" && ageStr == "" && diagnosis == "" {
+		if patients == nil {
+			patients = []models.Patient{}
+		}
+		utils.RespondJSON(w, http.StatusOK, patients)
+		return
+	}
+
+	var filtered []models.Patient
+	for _, p := range patients {
 		match := true
-		
-		if firstName != "" && !strings.Contains(strings.ToLower(patient.FirstName), strings.ToLower(firstName)) {
+
+		if firstName != "" && !strings.Contains(strings.ToLower(p.FirstName), firstName) {
 			match = false
 		}
-		if lastName != "" && !strings.Contains(strings.ToLower(patient.LastName), strings.ToLower(lastName)) {
+		if lastName != "" && !strings.Contains(strings.ToLower(p.LastName), lastName) {
 			match = false
 		}
 		if ageStr != "" {
 			age, err := strconv.Atoi(ageStr)
-			if err != nil || patient.Age != age {
+			if err != nil || p.Age != age {
 				match = false
 			}
 		}
-		if diagnosis != "" && !strings.Contains(strings.ToLower(patient.Diagnosis), strings.ToLower(diagnosis)) {
+		if diagnosis != "" && !strings.Contains(strings.ToLower(p.Diagnosis), diagnosis) {
 			match = false
 		}
-		
+
 		if match {
-			filteredPatients = append(filteredPatients, patient)
+			filtered = append(filtered, p)
 		}
 	}
-	
-	if filteredPatients == nil {
-		filteredPatients = []models.Patient{}
+
+	if filtered == nil {
+		filtered = []models.Patient{}
 	}
-	
-	utils.RespondJSON(w, http.StatusOK, filteredPatients)
+	utils.RespondJSON(w, http.StatusOK, filtered)
 }
 
 func GetPatientHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	id := utils.ExtractID(r.URL.Path, "/patients/")
 
-	storage.Store.RLock()
-	defer storage.Store.RUnlock()
-
-	for _, patient := range storage.Store.Patients {
-		if patient.ID == id {
-			utils.RespondJSON(w, http.StatusOK, patient)
-			return
+	patient, err := storage.Store.GetPatientByID(ctx, id)
+	if err != nil {
+		if strings.Contains(err.Error(), "no rows") || strings.Contains(err.Error(), "not found") {
+			utils.RespondError(w, http.StatusNotFound, "Patient not found")
+		} else {
+			utils.RespondError(w, http.StatusInternalServerError, "failed to fetch patient: "+err.Error())
 		}
+		return
 	}
-	utils.RespondError(w, http.StatusNotFound, "Patient not found")
+	utils.RespondJSON(w, http.StatusOK, patient)
 }
 
 func CreatePatientHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	var patient models.Patient
 	if err := json.NewDecoder(r.Body).Decode(&patient); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
-	storage.Store.Lock()
-	defer storage.Store.Unlock()
-
-	patient.ID = len(storage.Store.Patients) + 1
-	storage.Store.Patients = append(storage.Store.Patients, patient)
-	storage.Store.SaveToFile()
-
-	utils.RespondJSON(w, http.StatusCreated, patient)
+	created, err := storage.Store.CreatePatient(ctx, &patient)
+	if err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "failed to create patient: "+err.Error())
+		return
+	}
+	utils.RespondJSON(w, http.StatusCreated, created)
 }
 
 func UpdatePatientHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	id := utils.ExtractID(r.URL.Path, "/patients/")
 
-	var updatedPatient models.Patient
-	if err := json.NewDecoder(r.Body).Decode(&updatedPatient); err != nil {
+	var updated models.Patient
+	if err := json.NewDecoder(r.Body).Decode(&updated); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
+	updated.ID = id
 
-	storage.Store.Lock()
-	defer storage.Store.Unlock()
-
-	for i, patient := range storage.Store.Patients {
-		if patient.ID == id {
-			updatedPatient.ID = id
-			storage.Store.Patients[i] = updatedPatient
-			storage.Store.SaveToFile()
-			utils.RespondJSON(w, http.StatusOK, updatedPatient)
-			return
+	if err := storage.Store.UpdatePatient(ctx, &updated); err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			utils.RespondError(w, http.StatusNotFound, "Patient not found")
+		} else {
+			utils.RespondError(w, http.StatusInternalServerError, "update failed: "+err.Error())
 		}
+		return
 	}
-	utils.RespondError(w, http.StatusNotFound, "Patient not found")
+	utils.RespondJSON(w, http.StatusOK, updated)
 }
 
 func DeletePatientHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	id := utils.ExtractID(r.URL.Path, "/patients/")
 
-	storage.Store.Lock()
-	defer storage.Store.Unlock()
-
-	for i, patient := range storage.Store.Patients {
-		if patient.ID == id {
-			storage.Store.Patients = append(storage.Store.Patients[:i], storage.Store.Patients[i+1:]...)
-			storage.Store.SaveToFile()
-			utils.RespondJSON(w, http.StatusOK, map[string]string{"message": "Patient deleted"})
-			return
+	if err := storage.Store.DeletePatient(ctx, id); err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			utils.RespondError(w, http.StatusNotFound, "Patient not found")
+		} else {
+			utils.RespondError(w, http.StatusInternalServerError, "delete failed: "+err.Error())
 		}
+		return
 	}
-	utils.RespondError(w, http.StatusNotFound, "Patient not found")
+	utils.RespondJSON(w, http.StatusOK, map[string]string{"message": "Patient deleted"})
 }
 
 func PatientsRouter(w http.ResponseWriter, r *http.Request) {

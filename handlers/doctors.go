@@ -2,42 +2,50 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/TeseySTD/GoHospitalApi/models"
-	"github.com/TeseySTD/GoHospitalApi/storage"
-	"github.com/TeseySTD/GoHospitalApi/utils"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/TeseySTD/GoHospitalApi/models"
+	"github.com/TeseySTD/GoHospitalApi/storage"
+	"github.com/TeseySTD/GoHospitalApi/utils"
 )
 
 func GetDoctorsHandler(w http.ResponseWriter, r *http.Request) {
-	storage.Store.RLock()
-	defer storage.Store.RUnlock()
-	
-	query := r.URL.Query()
-	firstName := query.Get("first_name")
-	lastName := query.Get("last_name")
-	specialization := query.Get("specialization")
-	experienceStr := query.Get("experience")
-	minExpStr := query.Get("min_experience")
-	
-	if firstName == "" && lastName == "" && specialization == "" && experienceStr == "" && minExpStr == "" {
-		utils.RespondJSON(w, http.StatusOK, storage.Store.Doctors)
+	ctx := r.Context()
+
+	doctors, err := storage.Store.GetAllDoctors(ctx)
+	if err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "failed to fetch doctors: "+err.Error())
 		return
 	}
-	
-	var filteredDoctors []models.Doctor
-	
-	for _, doctor := range storage.Store.Doctors {
+
+	query := r.URL.Query()
+	firstName := strings.ToLower(query.Get("first_name"))
+	lastName := strings.ToLower(query.Get("last_name"))
+	specialization := strings.ToLower(query.Get("specialization"))
+	experienceStr := query.Get("experience")
+	minExpStr := query.Get("min_experience")
+
+	if firstName == "" && lastName == "" && specialization == "" && experienceStr == "" && minExpStr == "" {
+		if doctors == nil {
+			doctors = []models.Doctor{}
+		}
+		utils.RespondJSON(w, http.StatusOK, doctors)
+		return
+	}
+
+	var filtered []models.Doctor
+	for _, doctor := range doctors {
 		match := true
-		
-		if firstName != "" && !strings.Contains(strings.ToLower(doctor.FirstName), strings.ToLower(firstName)) {
+
+		if firstName != "" && !strings.Contains(strings.ToLower(doctor.FirstName), firstName) {
 			match = false
 		}
-		if lastName != "" && !strings.Contains(strings.ToLower(doctor.LastName), strings.ToLower(lastName)) {
+		if lastName != "" && !strings.Contains(strings.ToLower(doctor.LastName), lastName) {
 			match = false
 		}
-		if specialization != "" && !strings.Contains(strings.ToLower(doctor.Specialization), strings.ToLower(specialization)) {
+		if specialization != "" && !strings.Contains(strings.ToLower(doctor.Specialization), specialization) {
 			match = false
 		}
 		if experienceStr != "" {
@@ -52,52 +60,53 @@ func GetDoctorsHandler(w http.ResponseWriter, r *http.Request) {
 				match = false
 			}
 		}
-		
+
 		if match {
-			filteredDoctors = append(filteredDoctors, doctor)
+			filtered = append(filtered, doctor)
 		}
 	}
-	
-	if filteredDoctors == nil {
-		filteredDoctors = []models.Doctor{}
+
+	if filtered == nil {
+		filtered = []models.Doctor{}
 	}
-	
-	utils.RespondJSON(w, http.StatusOK, filteredDoctors)
+	utils.RespondJSON(w, http.StatusOK, filtered)
 }
 
 func GetDoctorHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	id := utils.ExtractID(r.URL.Path, "/doctors/")
 
-	storage.Store.RLock()
-	defer storage.Store.RUnlock()
-
-	for _, doctor := range storage.Store.Doctors {
-		if doctor.ID == id {
-			utils.RespondJSON(w, http.StatusOK, doctor)
-			return
+	doctor, err := storage.Store.GetDoctorByID(ctx, id)
+	if err != nil {
+		if strings.Contains(err.Error(), "no rows") || strings.Contains(err.Error(), "not found") {
+			utils.RespondError(w, http.StatusNotFound, "Doctor not found")
+		} else {
+			utils.RespondError(w, http.StatusInternalServerError, "failed to fetch doctor: "+err.Error())
 		}
+		return
 	}
-	utils.RespondError(w, http.StatusNotFound, "Doctor not found")
+	utils.RespondJSON(w, http.StatusOK, doctor)
 }
 
 func CreateDoctorHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	var doctor models.Doctor
 	if err := json.NewDecoder(r.Body).Decode(&doctor); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
-	storage.Store.Lock()
-	defer storage.Store.Unlock()
-
-	doctor.ID = len(storage.Store.Doctors) + 1
-	storage.Store.Doctors = append(storage.Store.Doctors, doctor)
-	storage.Store.SaveToFile()
-
-	utils.RespondJSON(w, http.StatusCreated, doctor)
+	created, err := storage.Store.CreateDoctor(ctx, &doctor)
+	if err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "failed to create doctor: "+err.Error())
+		return
+	}
+	utils.RespondJSON(w, http.StatusCreated, created)
 }
 
 func UpdateDoctorHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	id := utils.ExtractID(r.URL.Path, "/doctors/")
 
 	var updatedDoctor models.Doctor
@@ -105,37 +114,32 @@ func UpdateDoctorHandler(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
+	updatedDoctor.ID = id
 
-	storage.Store.Lock()
-	defer storage.Store.Unlock()
-
-	for i, doctor := range storage.Store.Doctors {
-		if doctor.ID == id {
-			updatedDoctor.ID = id
-			storage.Store.Doctors[i] = updatedDoctor
-			storage.Store.SaveToFile()
-			utils.RespondJSON(w, http.StatusOK, updatedDoctor)
-			return
+	if err := storage.Store.UpdateDoctor(ctx, &updatedDoctor); err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			utils.RespondError(w, http.StatusNotFound, "Doctor not found")
+		} else {
+			utils.RespondError(w, http.StatusInternalServerError, "update failed: "+err.Error())
 		}
+		return
 	}
-	utils.RespondError(w, http.StatusNotFound, "Doctor not found")
+	utils.RespondJSON(w, http.StatusOK, updatedDoctor)
 }
 
 func DeleteDoctorHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	id := utils.ExtractID(r.URL.Path, "/doctors/")
 
-	storage.Store.Lock()
-	defer storage.Store.Unlock()
-
-	for i, doctor := range storage.Store.Doctors {
-		if doctor.ID == id {
-			storage.Store.Doctors = append(storage.Store.Doctors[:i], storage.Store.Doctors[i+1:]...)
-			storage.Store.SaveToFile()
-			utils.RespondJSON(w, http.StatusOK, map[string]string{"message": "Doctor deleted"})
-			return
+	if err := storage.Store.DeleteDoctor(ctx, id); err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			utils.RespondError(w, http.StatusNotFound, "Doctor not found")
+		} else {
+			utils.RespondError(w, http.StatusInternalServerError, "delete failed: "+err.Error())
 		}
+		return
 	}
-	utils.RespondError(w, http.StatusNotFound, "Doctor not found")
+	utils.RespondJSON(w, http.StatusOK, map[string]string{"message": "Doctor deleted"})
 }
 
 func DoctorsRouter(w http.ResponseWriter, r *http.Request) {

@@ -245,7 +245,7 @@ X-API-Key: my-secret-api-key-12345
 
 {
   "patient_id": 3,
-  "doctor_id": 3,
+  "doctor_id": 4,
   "date": "2025-10-16",
   "time": "09:00",
   "status": "Scheduled"
