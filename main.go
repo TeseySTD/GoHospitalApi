@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/TeseySTD/GoHospitalApi/handlers"
+	"github.com/TeseySTD/GoHospitalApi/middleware"
 	"github.com/TeseySTD/GoHospitalApi/storage"
 )
 
@@ -13,18 +14,44 @@ func main() {
 		log.Println("Creating new storage file...")
 	}
 
-	// Routers
-	http.HandleFunc("/patients", handlers.PatientsRouter)
-	http.HandleFunc("/patients/", handlers.PatientsRouter)
-	http.HandleFunc("/doctors", handlers.DoctorsRouter)
-	http.HandleFunc("/doctors/", handlers.DoctorsRouter)
-	http.HandleFunc("/appointments", handlers.AppointmentsRouter)
-	http.HandleFunc("/appointments/", handlers.AppointmentsRouter)
+	http.HandleFunc("/patients", middleware.Chain(
+		handlers.PatientsRouter,
+		middleware.LoggingMiddleware,
+		middleware.AuthMiddleware,
+	))
+	http.HandleFunc("/patients/", middleware.Chain(
+		handlers.PatientsRouter,
+		middleware.LoggingMiddleware,
+		middleware.AuthMiddleware,
+	))
 
-	// Root page with api description
-	http.HandleFunc("/", handlers.RootHandler)
+	http.HandleFunc("/doctors", middleware.Chain(
+		handlers.DoctorsRouter,
+		middleware.LoggingMiddleware,
+		middleware.AuthMiddleware,
+	))
+	http.HandleFunc("/doctors/", middleware.Chain(
+		handlers.DoctorsRouter,
+		middleware.LoggingMiddleware,
+		middleware.AuthMiddleware,
+	))
+
+	http.HandleFunc("/appointments", middleware.Chain(
+		handlers.AppointmentsRouter,
+		middleware.LoggingMiddleware,
+		middleware.AuthMiddleware,
+	))
+	http.HandleFunc("/appointments/", middleware.Chain(
+		handlers.AppointmentsRouter,
+		middleware.LoggingMiddleware,
+		middleware.AuthMiddleware,
+	))
+
+	http.HandleFunc("/", middleware.LoggingMiddleware(handlers.RootHandler))
 
 	port := ":8080"
+	log.Printf("Server starting on port %s", port)
+	log.Printf("API Key for authorization: %s", middleware.ValidAPIKey)
 
 	log.Fatal(http.ListenAndServe(port, nil))
 }

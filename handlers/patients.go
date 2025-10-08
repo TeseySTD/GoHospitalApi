@@ -6,13 +6,56 @@ import (
 	"github.com/TeseySTD/GoHospitalApi/storage"
 	"github.com/TeseySTD/GoHospitalApi/utils"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
 func GetPatientsHandler(w http.ResponseWriter, r *http.Request) {
 	storage.Store.RLock()
 	defer storage.Store.RUnlock()
-	utils.RespondJSON(w, http.StatusOK, storage.Store.Patients)
+	
+	query := r.URL.Query()
+	firstName := query.Get("first_name")
+	lastName := query.Get("last_name")
+	ageStr := query.Get("age")
+	diagnosis := query.Get("diagnosis")
+	
+	if firstName == "" && lastName == "" && ageStr == "" && diagnosis == "" {
+		utils.RespondJSON(w, http.StatusOK, storage.Store.Patients)
+		return
+	}
+	
+	var filteredPatients []models.Patient
+	
+	for _, patient := range storage.Store.Patients {
+		match := true
+		
+		if firstName != "" && !strings.Contains(strings.ToLower(patient.FirstName), strings.ToLower(firstName)) {
+			match = false
+		}
+		if lastName != "" && !strings.Contains(strings.ToLower(patient.LastName), strings.ToLower(lastName)) {
+			match = false
+		}
+		if ageStr != "" {
+			age, err := strconv.Atoi(ageStr)
+			if err != nil || patient.Age != age {
+				match = false
+			}
+		}
+		if diagnosis != "" && !strings.Contains(strings.ToLower(patient.Diagnosis), strings.ToLower(diagnosis)) {
+			match = false
+		}
+		
+		if match {
+			filteredPatients = append(filteredPatients, patient)
+		}
+	}
+	
+	if filteredPatients == nil {
+		filteredPatients = []models.Patient{}
+	}
+	
+	utils.RespondJSON(w, http.StatusOK, filteredPatients)
 }
 
 func GetPatientHandler(w http.ResponseWriter, r *http.Request) {

@@ -6,13 +6,63 @@ import (
 	"github.com/TeseySTD/GoHospitalApi/storage"
 	"github.com/TeseySTD/GoHospitalApi/utils"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
 func GetDoctorsHandler(w http.ResponseWriter, r *http.Request) {
 	storage.Store.RLock()
 	defer storage.Store.RUnlock()
-	utils.RespondJSON(w, http.StatusOK, storage.Store.Doctors)
+	
+	query := r.URL.Query()
+	firstName := query.Get("first_name")
+	lastName := query.Get("last_name")
+	specialization := query.Get("specialization")
+	experienceStr := query.Get("experience")
+	minExpStr := query.Get("min_experience")
+	
+	if firstName == "" && lastName == "" && specialization == "" && experienceStr == "" && minExpStr == "" {
+		utils.RespondJSON(w, http.StatusOK, storage.Store.Doctors)
+		return
+	}
+	
+	var filteredDoctors []models.Doctor
+	
+	for _, doctor := range storage.Store.Doctors {
+		match := true
+		
+		if firstName != "" && !strings.Contains(strings.ToLower(doctor.FirstName), strings.ToLower(firstName)) {
+			match = false
+		}
+		if lastName != "" && !strings.Contains(strings.ToLower(doctor.LastName), strings.ToLower(lastName)) {
+			match = false
+		}
+		if specialization != "" && !strings.Contains(strings.ToLower(doctor.Specialization), strings.ToLower(specialization)) {
+			match = false
+		}
+		if experienceStr != "" {
+			experience, err := strconv.Atoi(experienceStr)
+			if err != nil || doctor.Experience != experience {
+				match = false
+			}
+		}
+		if minExpStr != "" {
+			minExp, err := strconv.Atoi(minExpStr)
+			if err != nil || doctor.Experience < minExp {
+				match = false
+			}
+		}
+		
+		if match {
+			filteredDoctors = append(filteredDoctors, doctor)
+		}
+	}
+	
+	if filteredDoctors == nil {
+		filteredDoctors = []models.Doctor{}
+	}
+	
+	utils.RespondJSON(w, http.StatusOK, filteredDoctors)
 }
 
 func GetDoctorHandler(w http.ResponseWriter, r *http.Request) {

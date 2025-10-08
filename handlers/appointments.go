@@ -6,13 +6,59 @@ import (
 	"github.com/TeseySTD/GoHospitalApi/storage"
 	"github.com/TeseySTD/GoHospitalApi/utils"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
 func GetAppointmentsHandler(w http.ResponseWriter, r *http.Request) {
 	storage.Store.RLock()
 	defer storage.Store.RUnlock()
-	utils.RespondJSON(w, http.StatusOK, storage.Store.Appointments)
+	
+	query := r.URL.Query()
+	patientIDStr := query.Get("patient_id")
+	doctorIDStr := query.Get("doctor_id")
+	date := query.Get("date")
+	status := query.Get("status")
+	
+	if patientIDStr == "" && doctorIDStr == "" && date == "" && status == "" {
+		utils.RespondJSON(w, http.StatusOK, storage.Store.Appointments)
+		return
+	}
+	
+	var filteredAppointments []models.Appointment
+	
+	for _, appointment := range storage.Store.Appointments {
+		match := true
+		
+		if patientIDStr != "" {
+			patientID, err := strconv.Atoi(patientIDStr)
+			if err != nil || appointment.PatientID != patientID {
+				match = false
+			}
+		}
+		if doctorIDStr != "" {
+			doctorID, err := strconv.Atoi(doctorIDStr)
+			if err != nil || appointment.DoctorID != doctorID {
+				match = false
+			}
+		}
+		if date != "" && appointment.Date != date {
+			match = false
+		}
+		if status != "" && !strings.EqualFold(appointment.Status, status) {
+			match = false
+		}
+		
+		if match {
+			filteredAppointments = append(filteredAppointments, appointment)
+		}
+	}
+	
+	if filteredAppointments == nil {
+		filteredAppointments = []models.Appointment{}
+	}
+	
+	utils.RespondJSON(w, http.StatusOK, filteredAppointments)
 }
 
 func GetAppointmentHandler(w http.ResponseWriter, r *http.Request) {

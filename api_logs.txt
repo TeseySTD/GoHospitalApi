@@ -1,0 +1,31 @@
+2025-10-08 13:27:18 | Method: GET | Path: /patients | Query:  | Duration: 74.703µs
+2025-10-08 13:27:20 | Method: GET | Path: / | Query:  | Duration: 118.374µs
+2025-10-08 13:27:33 | Method: GET | Path: /patients | Query:  | Duration: 60.975µs
+2025-10-08 13:27:47 | Method: GET | Path: /patients | Query: first_name=Ivan | Duration: 43.91µs
+2025-10-08 13:27:49 | Method: GET | Path: /patients | Query: age=35 | Duration: 45.931µs
+2025-10-08 13:27:53 | Method: GET | Path: /patients | Query: diagnosis=flu | Duration: 41.573µs
+2025-10-08 13:27:56 | Method: GET | Path: /patients | Query: first_name=Ivan&age=35 | Duration: 65.51µs
+2025-10-08 13:27:57 | Method: GET | Path: /patients | Query: first_name=Ivan&age=35 | Duration: 36.52µs
+2025-10-08 13:27:59 | Method: GET | Path: /patients/1 | Query:  | Duration: 82.091µs
+2025-10-08 13:28:02 | Method: POST | Path: /patients | Query:  | Duration: 4.062734ms
+2025-10-08 13:28:10 | Method: PUT | Path: /patients/1 | Query:  | Duration: 2.733632ms
+2025-10-08 13:28:16 | Method: DELETE | Path: /patients/3 | Query:  | Duration: 3.436466ms
+2025-10-08 13:28:19 | Method: DELETE | Path: /patients/3 | Query:  | Duration: 44.695µs
+2025-10-08 13:28:21 | Method: GET | Path: /patients | Query:  | Duration: 13.202µs
+2025-10-08 13:28:26 | Method: GET | Path: /patients | Query:  | Duration: 27.102µs
+2025-10-08 13:29:43 | Method: GET | Path: /doctors | Query:  | Duration: 24.619µs
+2025-10-08 13:29:47 | Method: POST | Path: /doctors | Query:  | Duration: 2.693353ms
+2025-10-08 13:29:49 | Method: GET | Path: /doctors | Query:  | Duration: 25.297µs
+2025-10-08 13:29:52 | Method: POST | Path: /doctors | Query:  | Duration: 3.30995ms
+2025-10-08 13:29:53 | Method: POST | Path: /doctors | Query:  | Duration: 2.842033ms
+2025-10-08 13:29:58 | Method: GET | Path: /doctors | Query: last_name=Kovalenko | Duration: 58.011µs
+2025-10-08 13:30:00 | Method: GET | Path: /doctors | Query: min_experience=10 | Duration: 30.387µs
+2025-10-08 13:30:05 | Method: PUT | Path: /doctors/1 | Query:  | Duration: 2.134642ms
+2025-10-08 13:30:07 | Method: DELETE | Path: /doctors/4 | Query:  | Duration: 71.982µs
+2025-10-08 13:30:10 | Method: POST | Path: /doctors | Query:  | Duration: 2.984783ms
+2025-10-08 13:30:12 | Method: DELETE | Path: /doctors/4 | Query:  | Duration: 2.238266ms
+2025-10-08 13:30:14 | Method: GET | Path: /appointments | Query:  | Duration: 22.56µs
+2025-10-08 13:30:21 | Method: POST | Path: /appointments | Query:  | Duration: 2.367456ms
+2025-10-08 13:30:23 | Method: GET | Path: /appointments | Query:  | Duration: 26.876µs
+2025-10-08 13:30:27 | Method: PUT | Path: /appointments/1 | Query:  | Duration: 2.577986ms
+2025-10-08 13:30:31 | Method: DELETE | Path: /appointments/4 | Query:  | Duration: 31.023µs

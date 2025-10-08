@@ -1,0 +1,295 @@
+### Get information about API 
+GET http://localhost:8080/
+
+###############################################
+# PATIENTS
+###############################################
+
+### Get all patients
+GET http://localhost:8080/patients
+X-API-Key: my-secret-api-key-12345
+
+### Get all patients with filter by first name
+GET http://localhost:8080/patients?first_name=Ivan
+X-API-Key: my-secret-api-key-12345
+
+### Get all patients with filter by age
+GET http://localhost:8080/patients?age=35
+X-API-Key: my-secret-api-key-12345
+
+### Get all patients with filter by diagnosis
+GET http://localhost:8080/patients?diagnosis=flu
+X-API-Key: my-secret-api-key-12345
+
+### Get all patients with multiple filters
+GET http://localhost:8080/patients?first_name=Ivan&age=35
+X-API-Key: my-secret-api-key-12345
+
+### Get patient by ID
+GET http://localhost:8080/patients/1
+X-API-Key: my-secret-api-key-12345
+
+### Create new patient
+POST http://localhost:8080/patients
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "first_name": "Ivan",
+  "last_name": "Petrinko",
+  "age": 35,
+  "diagnosis": "Flu"
+}
+
+### Create new patient
+POST http://localhost:8080/patients
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "first_name": "Maria",
+  "last_name": "Shevchenko",
+  "age": 28,
+  "diagnosis": "Allergy"
+}
+
+### Create new patient
+POST http://localhost:8080/patients
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "first_name": "Petro",
+  "last_name": "Kovalenko",
+  "age": 45,
+  "diagnosis": "Bronchitis"
+}
+
+### Update patient
+PUT http://localhost:8080/patients/1
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "first_name": "Ivan",
+  "last_name": "Petrinko",
+  "age": 36,
+  "diagnosis": "Odrazh"
+}
+
+### Delete patient
+DELETE http://localhost:8080/patients/3
+X-API-Key: my-secret-api-key-12345
+
+### Test without API key (should fail)
+GET http://localhost:8080/patients
+
+### Test with wrong API key (should fail)
+GET http://localhost:8080/patients
+X-API-Key: wrong-key
+
+###############################################
+# DOCTORS 
+###############################################
+
+### Get all doctors
+GET http://localhost:8080/doctors
+X-API-Key: my-secret-api-key-12345
+
+### Get doctors by specialization
+GET http://localhost:8080/doctors?specialization=cardiologist
+X-API-Key: my-secret-api-key-12345
+
+### Get doctors with minimum experience
+GET http://localhost:8080/doctors?min_experience=10
+X-API-Key: my-secret-api-key-12345
+
+### Get doctors with exact experience
+GET http://localhost:8080/doctors?experience=5
+X-API-Key: my-secret-api-key-12345
+
+### Get doctors by last name
+GET http://localhost:8080/doctors?last_name=Kovalenko
+X-API-Key: my-secret-api-key-12345
+
+### Get doctor by ID
+GET http://localhost:8080/doctors/1
+X-API-Key: my-secret-api-key-12345
+
+### Create new doctor
+POST http://localhost:8080/doctors
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "first_name": "Olena",
+  "last_name": "Kovalenko",
+  "specialization": "Cardiologist",
+  "experience": 10
+}
+
+### Create new doctor
+POST http://localhost:8080/doctors
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "first_name": "Andriy",
+  "last_name": "Melnyk",
+  "specialization": "Therapist",
+  "experience": 5
+}
+
+### Create new doctor
+POST http://localhost:8080/doctors
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "first_name": "Viktor",
+  "last_name": "Bondarenko",
+  "specialization": "Surgeon",
+  "experience": 15
+}
+
+### Create new doctor
+POST http://localhost:8080/doctors
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "first_name": "Natalia",
+  "last_name": "Ivanchenko",
+  "specialization": "Pediatrician",
+  "experience": 8
+}
+
+### Update doctor
+PUT http://localhost:8080/doctors/1
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "first_name": "Olena",
+  "last_name": "Kovalenko",
+  "specialization": "Cardiologist",
+  "experience": 11
+}
+
+### Delete doctor
+DELETE http://localhost:8080/doctors/4
+X-API-Key: my-secret-api-key-12345
+
+###############################################
+# APPOINTMENTS
+###############################################
+
+### Get all appointments
+GET http://localhost:8080/appointments
+X-API-Key: my-secret-api-key-12345
+
+### Get appointments by patient ID
+GET http://localhost:8080/appointments?patient_id=1
+X-API-Key: my-secret-api-key-12345
+
+### Get appointments by doctor ID
+GET http://localhost:8080/appointments?doctor_id=2
+X-API-Key: my-secret-api-key-12345
+
+### Get appointments by date
+GET http://localhost:8080/appointments?date=2025-10-15
+X-API-Key: my-secret-api-key-12345
+
+### Get appointments by status
+GET http://localhost:8080/appointments?status=Scheduled
+X-API-Key: my-secret-api-key-12345
+
+### Get appointments with multiple filters
+GET http://localhost:8080/appointments?patient_id=1&status=Scheduled
+X-API-Key: my-secret-api-key-12345
+
+### Get appointment by ID
+GET http://localhost:8080/appointments/1
+X-API-Key: my-secret-api-key-12345
+
+### Create new appointment
+POST http://localhost:8080/appointments
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "patient_id": 1,
+  "doctor_id": 1,
+  "date": "2025-10-15",
+  "time": "10:00",
+  "status": "Scheduled"
+}
+
+### Create new appointment
+POST http://localhost:8080/appointments
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "patient_id": 2,
+  "doctor_id": 2,
+  "date": "2025-10-15",
+  "time": "11:30",
+  "status": "Scheduled"
+}
+
+### Create new appointment
+POST http://localhost:8080/appointments
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "patient_id": 3,
+  "doctor_id": 3,
+  "date": "2025-10-16",
+  "time": "09:00",
+  "status": "Scheduled"
+}
+
+### Create new appointment
+POST http://localhost:8080/appointments
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "patient_id": 1,
+  "doctor_id": 2,
+  "date": "2025-10-20",
+  "time": "14:00",
+  "status": "Scheduled"
+}
+
+### Update appointment
+PUT http://localhost:8080/appointments/1
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "patient_id": 1,
+  "doctor_id": 1,
+  "date": "2025-10-15",
+  "time": "10:00",
+  "status": "Finished"
+}
+
+### Update appointment
+PUT http://localhost:8080/appointments/2
+Content-Type: application/json
+X-API-Key: my-secret-api-key-12345
+
+{
+  "patient_id": 2,
+  "doctor_id": 2,
+  "date": "2025-10-15",
+  "time": "15:00",
+  "status": "Rescheduled"
+}
+
+### Delete appointment
+DELETE http://localhost:8080/appointments/4
+X-API-Key: my-secret-api-key-12345
