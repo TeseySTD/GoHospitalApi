@@ -1,0 +1,212 @@
+### Get information about API
+GET http://localhost:8080/
+
+###############################################
+# PATIENTS (Patients)
+###############################################
+
+### Get all patients
+GET http://localhost:8080/patients
+
+### Get patient by ID
+GET http://localhost:8080/patients/1
+
+### Create new patient
+POST http://localhost:8080/patients
+Content-Type: application/json
+
+{
+  "first_name": "Ivan",
+  "last_name": "Petrinko",
+  "age": 35,
+  "diagnosis": "Flu"
+}
+
+### Create new patient
+POST http://localhost:8080/patients
+Content-Type: application/json
+
+{
+  "first_name": "Maria",
+  "last_name": "Shevchenko",
+  "age": 28,
+  "diagnosis": "Allergy"
+}
+
+### Create new patient
+POST http://localhost:8080/patients
+Content-Type: application/json
+
+{
+  "first_name": "Petro",
+  "last_name": "Kovalenko",
+  "age": 45,
+  "diagnosis": "Bronchitis"
+}
+
+### Update patient
+PUT http://localhost:8080/patients/1
+Content-Type: application/json
+
+{
+  "first_name": "Ivan",
+  "last_name": "Petrinko",
+  "age": 36,
+  "diagnosis": "Odrazh"
+}
+
+### Delete patient
+DELETE http://localhost:8080/patients/3
+
+###############################################
+# DOCTORS (Doctors)
+###############################################
+
+### Get all doctors
+GET http://localhost:8080/doctors
+
+### Get doctor by ID
+GET http://localhost:8080/doctors/1
+
+### Create new doctor
+POST http://localhost:8080/doctors
+Content-Type: application/json
+
+{
+  "first_name": "Olena",
+  "last_name": "Kovalenko",
+  "specialization": "Cardiologist",
+  "experience": 10
+}
+
+### Create new doctor
+POST http://localhost:8080/doctors
+Content-Type: application/json
+
+{
+  "first_name": "Andriy",
+  "last_name": "Melnyk",
+  "specialization": "Therapist",
+  "experience": 5
+}
+
+### Create new doctor
+POST http://localhost:8080/doctors
+Content-Type: application/json
+
+{
+  "first_name": "Viktor",
+  "last_name": "Bondarenko",
+  "specialization": "Surgeon",
+  "experience": 15
+}
+
+### Create new doctor
+POST http://localhost:8080/doctors
+Content-Type: application/json
+
+{
+  "first_name": "Natalia",
+  "last_name": "Ivanchenko",
+  "specialization": "Pediatrician",
+  "experience": 8
+}
+
+### Update doctor
+PUT http://localhost:8080/doctors/1
+Content-Type: application/json
+
+{
+  "first_name": "Olena",
+  "last_name": "Kovalenko",
+  "specialization": "Cardiologist",
+  "experience": 11
+}
+
+### Delete doctor
+DELETE http://localhost:8080/doctors/4
+
+###############################################
+# APPOINTMENTS (Appointments)
+###############################################
+
+### Get all appointments
+GET http://localhost:8080/appointments
+
+### Get appointment by ID
+GET http://localhost:8080/appointments/1
+
+### Create new appointment
+POST http://localhost:8080/appointments
+Content-Type: application/json
+
+{
+  "patient_id": 1,
+  "doctor_id": 1,
+  "date": "2025-10-15",
+  "time": "10:00",
+  "status": "Scheduled"
+}
+
+### Create new appointment
+POST http://localhost:8080/appointments
+Content-Type: application/json
+
+{
+  "patient_id": 2,
+  "doctor_id": 2,
+  "date": "2025-10-15",
+  "time": "11:30",
+  "status": "Scheduled"
+}
+
+### Create new appointment
+POST http://localhost:8080/appointments
+Content-Type: application/json
+
+{
+  "patient_id": 3,
+  "doctor_id": 3,
+  "date": "2025-10-16",
+  "time": "09:00",
+  "status": "Scheduled"
+}
+
+### Create new appointment
+POST http://localhost:8080/appointments
+Content-Type: application/json
+
+{
+  "patient_id": 1,
+  "doctor_id": 2,
+  "date": "2025-10-20",
+  "time": "14:00",
+  "status": "Scheduled"
+}
+
+### Update appointment
+PUT http://localhost:8080/appointments/1
+Content-Type: application/json
+
+{
+  "patient_id": 1,
+  "doctor_id": 1,
+  "date": "2025-10-15",
+  "time": "10:00",
+  "status": "Finished"
+}
+
+### Update appointment
+PUT http://localhost:8080/appointments/2
+Content-Type: application/json
+
+{
+  "patient_id": 2,
+  "doctor_id": 2,
+  "date": "2025-10-15",
+  "time": "15:00",
+  "status": "Rescheduled"
+}
+
+### Delete appointment
+DELETE http://localhost:8080/appointments/4
