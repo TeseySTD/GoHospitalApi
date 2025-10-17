@@ -60,3 +60,58 @@
 2025-10-08 18:55:23 | Method: GET | Path: /appointments/1 | Query:  | Duration: 2.523727ms
 2025-10-08 18:55:29 | Method: PUT | Path: /appointments/1 | Query:  | Duration: 2.827057ms
 2025-10-08 18:55:36 | Method: DELETE | Path: /appointments/1 | Query:  | Duration: 2.302872ms
+2025-10-10 10:20:06 | Method: GET | Path: /patients | Query:  | Duration: 20.047486ms
+2025-10-10 10:20:18 | Method: GET | Path: /patients | Query: first_name=Ivan | Duration: 1.52238ms
+2025-10-10 10:20:21 | Method: GET | Path: /patients | Query: age=35 | Duration: 1.212141ms
+2025-10-10 10:20:22 | Method: GET | Path: /patients | Query: age=35 | Duration: 1.595268ms
+2025-10-10 10:20:29 | Method: GET | Path: /patients/1 | Query:  | Duration: 9.073696ms
+2025-10-17 22:18:16 | Method: GET | Path: / | Query:  | Duration: 90.74µs
+2025-10-17 22:18:22 | Method: GET | Path: /users | Query:  | Duration: 102.386µs
+2025-10-17 22:18:37 | Method: POST | Path: /login | Query:  | Duration: 342.892µs
+2025-10-17 22:18:44 | Method: POST | Path: /login | Query:  | Duration: 200.827µs
+2025-10-17 22:18:47 | Method: POST | Path: /login | Query:  | Duration: 224.286µs
+2025-10-17 22:18:49 | Method: POST | Path: /login | Query:  | Duration: 75.86µs
+2025-10-17 22:18:53 | Method: POST | Path: /login | Query:  | Duration: 55.387µs
+2025-10-17 22:19:11 | Method: POST | Path: /login | Query:  | Duration: 103.146µs
+2025-10-17 22:19:18 | Method: GET | Path: /patients | Query:  | Duration: 52.268µs
+2025-10-17 22:19:23 | Method: GET | Path: /patients | Query:  | Duration: 17.976056ms
+2025-10-17 22:23:34 | Method: POST | Path: /login | Query:  | Duration: 113.603µs
+2025-10-17 22:23:46 | Method: POST | Path: /login | Query:  | Duration: 66.018µs
+2025-10-17 22:23:48 | Method: POST | Path: /login | Query:  | Duration: 55.347µs
+2025-10-17 22:24:07 | Method: GET | Path: /patients | Query:  | Duration: 66.82µs
+2025-10-17 22:24:09 | Method: GET | Path: /patients | Query:  | Duration: 46.736µs
+2025-10-17 22:24:22 | Method: GET | Path: /patients | Query:  | Duration: 907.791µs
+2025-10-17 22:25:21 | Method: GET | Path: /patients | Query:  | Duration: 999.646µs
+2025-10-17 22:25:22 | Method: GET | Path: /patients/1 | Query:  | Duration: 6.991789ms
+2025-10-17 22:25:24 | Method: GET | Path: /patients/1 | Query:  | Duration: 1.205887ms
+2025-10-17 22:25:26 | Method: GET | Path: /patients | Query: first_name=Ivan | Duration: 846.622µs
+2025-10-17 22:25:27 | Method: POST | Path: /patients | Query:  | Duration: 6.727033ms
+2025-10-17 22:25:30 | Method: PUT | Path: /patients/1 | Query:  | Duration: 5.807765ms
+2025-10-17 22:25:31 | Method: DELETE | Path: /patients/1 | Query:  | Duration: 5.47424ms
+2025-10-17 22:25:34 | Method: GET | Path: /patients | Query:  | Duration: 56.94µs
+2025-10-17 22:26:01 | Method: GET | Path: /patients | Query:  | Duration: 658.948µs
+2025-10-17 22:26:02 | Method: GET | Path: /patients/1 | Query:  | Duration: 1.255961ms
+2025-10-17 22:26:05 | Method: POST | Path: /patients | Query:  | Duration: 92.364µs
+2025-10-17 22:26:09 | Method: PUT | Path: /patients/1 | Query:  | Duration: 94.688µs
+2025-10-17 22:26:12 | Method: DELETE | Path: /patients/1 | Query:  | Duration: 84.932µs
+2025-10-17 22:26:13 | Method: GET | Path: /doctors/1 | Query:  | Duration: 4.453999ms
+2025-10-17 22:26:16 | Method: POST | Path: /doctors | Query:  | Duration: 4.456321ms
+2025-10-17 22:26:26 | Method: GET | Path: /patients | Query:  | Duration: 40.564µs
+2025-10-17 22:26:27 | Method: GET | Path: /patients | Query:  | Duration: 68.424µs
+2025-10-17 22:28:13 | Method: GET | Path: / | Query:  | Duration: 38.976µs
+2025-10-17 22:28:14 | Method: GET | Path: /users | Query:  | Duration: 99.759µs
+2025-10-17 22:28:23 | Method: POST | Path: /login | Query:  | Duration: 207.73µs
+2025-10-17 22:28:26 | Method: POST | Path: /login | Query:  | Duration: 82.324µs
+2025-10-17 22:28:30 | Method: POST | Path: /login | Query:  | Duration: 84.982µs
+2025-10-17 22:29:23 | Method: GET | Path: /patients | Query:  | Duration: 3.270225ms
+2025-10-17 22:29:25 | Method: POST | Path: /login | Query:  | Duration: 132.75µs
+2025-10-17 22:29:27 | Method: GET | Path: /patients/1 | Query:  | Duration: 2.144652ms
+2025-10-17 22:29:37 | Method: GET | Path: /patients | Query:  | Duration: 46.001µs
+2025-10-17 22:29:38 | Method: GET | Path: /patients | Query:  | Duration: 137.439µs
+2025-10-17 22:29:39 | Method: GET | Path: /patients | Query:  | Duration: 85.568µs
+2025-10-17 22:29:48 | Method: GET | Path: /appointments/1 | Query:  | Duration: 7.277725ms
+2025-10-17 22:29:51 | Method: POST | Path: /appointments | Query:  | Duration: 6.868663ms
+2025-10-17 22:30:00 | Method: GET | Path: /doctors/1 | Query:  | Duration: 2.511323ms
+2025-10-17 22:30:01 | Method: GET | Path: /doctors | Query: specialization=cardiologist | Duration: 2.012379ms
+2025-10-17 22:30:07 | Method: GET | Path: /doctors | Query: specialization=cardiologist | Duration: 36.316µs
+2025-10-17 22:30:10 | Method: GET | Path: /doctors | Query: specialization=cardiologist | Duration: 2.13009ms

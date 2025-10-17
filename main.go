@@ -34,44 +34,53 @@ func main() {
 	}
 	log.Println("Database migrated/ready")
 
+	//Public endpoints
+	http.HandleFunc("/", middleware.LoggingMiddleware(handlers.RootHandler))
+	http.HandleFunc("/login", middleware.LoggingMiddleware(handlers.LoginHandler))
+	http.HandleFunc("/users", middleware.LoggingMiddleware(handlers.UsersListHandler))
+
+	// Protected endpoints
 	http.HandleFunc("/patients", middleware.Chain(
 		handlers.PatientsRouter,
 		middleware.LoggingMiddleware,
-		middleware.AuthMiddleware,
+		middleware.JWTAuthMiddleware,
+		middleware.RoleBasedAccess,
 	))
 	http.HandleFunc("/patients/", middleware.Chain(
 		handlers.PatientsRouter,
 		middleware.LoggingMiddleware,
-		middleware.AuthMiddleware,
+		middleware.JWTAuthMiddleware,
+		middleware.RoleBasedAccess,
 	))
 
 	http.HandleFunc("/doctors", middleware.Chain(
 		handlers.DoctorsRouter,
 		middleware.LoggingMiddleware,
-		middleware.AuthMiddleware,
+		middleware.JWTAuthMiddleware,
+		middleware.RoleBasedAccess,
 	))
 	http.HandleFunc("/doctors/", middleware.Chain(
 		handlers.DoctorsRouter,
 		middleware.LoggingMiddleware,
-		middleware.AuthMiddleware,
+		middleware.JWTAuthMiddleware,
+		middleware.RoleBasedAccess,
 	))
 
 	http.HandleFunc("/appointments", middleware.Chain(
 		handlers.AppointmentsRouter,
 		middleware.LoggingMiddleware,
-		middleware.AuthMiddleware,
+		middleware.JWTAuthMiddleware,
+		middleware.RoleBasedAccess,
 	))
 	http.HandleFunc("/appointments/", middleware.Chain(
 		handlers.AppointmentsRouter,
 		middleware.LoggingMiddleware,
-		middleware.AuthMiddleware,
+		middleware.JWTAuthMiddleware,
+		middleware.RoleBasedAccess,
 	))
-
-	http.HandleFunc("/", middleware.LoggingMiddleware(handlers.RootHandler))
 
 	port := ":8080"
 	log.Printf("Server starting on port %s", port)
-	log.Printf("API Key for authorization: %s", middleware.ValidAPIKey)
 
 	srv := &http.Server{
 		Addr:         port,

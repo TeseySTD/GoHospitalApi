@@ -1,38 +1,83 @@
-### Get information about API 
+# Tokens
+@admin_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzYwODE1NzEwLCJpYXQiOjE3NjA3MjkzMTB9.XCwXhHsTWeQU9ZGjEq-lkQAfaWf8Reeu2N71S9wVGdM
+@reader_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJlYWRlciIsInJvbGUiOiJyZWFkZXIiLCJleHAiOjE3NjA4MTU0MjgsImlhdCI6MTc2MDcyOTAyOH0.zl__MvF9nwrQtoy9J_44GqtAuVGop3zaSLjz7oEsiVI
+
+
+### Get API info (без аутентифікації)
 GET http://localhost:8080/
 
+### Get list of available users (без аутентифікації)
+GET http://localhost:8080/users
+
 ###############################################
-# PATIENTS
+# AUTHENTICATION (Аутентифікація)
 ###############################################
 
-### Get all patients
+### Login as ADMIN (full access)
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+### Login as READER (read-only)
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "reader",
+  "password": "reader123"
+}
+
+### Login as DOCTOR (full access)
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "doctor",
+  "password": "doctor123"
+}
+
+### Login as VIEWER (read-only)
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "viewer",
+  "password": "viewer123"
+}
+
+### Test invalid login
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "invalid",
+  "password": "wrong"
+}
+
+###############################################
+# PATIENTS - ADMIN ACCESS
+###############################################
+
+### Get all patients (ADMIN)
 GET http://localhost:8080/patients
-X-API-Key: my-secret-api-key-12345
+Authorization: Bearer {{admin_token}}
 
-### Get all patients with filter by first name
-GET http://localhost:8080/patients?first_name=Ivan
-X-API-Key: my-secret-api-key-12345
-
-### Get all patients with filter by age
-GET http://localhost:8080/patients?age=35
-X-API-Key: my-secret-api-key-12345
-
-### Get all patients with filter by diagnosis
-GET http://localhost:8080/patients?diagnosis=flu
-X-API-Key: my-secret-api-key-12345
-
-### Get all patients with multiple filters
-GET http://localhost:8080/patients?first_name=Ivan&age=35
-X-API-Key: my-secret-api-key-12345
-
-### Get patient by ID
+### Get patient by ID (ADMIN)
 GET http://localhost:8080/patients/1
-X-API-Key: my-secret-api-key-12345
+Authorization: Bearer {{admin_token}}
 
-### Create new patient
+### Get patients with filter (ADMIN)
+GET http://localhost:8080/patients?first_name=Ivan
+Authorization: Bearer {{admin_token}}
+
+### Create new patient (ADMIN only)
 POST http://localhost:8080/patients
 Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
+Authorization: Bearer {{admin_token}}
 
 {
   "first_name": "Ivan",
@@ -41,85 +86,82 @@ X-API-Key: my-secret-api-key-12345
   "diagnosis": "Flu"
 }
 
-### Create new patient
-POST http://localhost:8080/patients
-Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
-
-{
-  "first_name": "Maria",
-  "last_name": "Shevchenko",
-  "age": 28,
-  "diagnosis": "Allergy"
-}
-
-### Create new patient
-POST http://localhost:8080/patients
-Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
-
-{
-  "first_name": "Petro",
-  "last_name": "Kovalenko",
-  "age": 45,
-  "diagnosis": "Bronchitis"
-}
-
-### Update patient
+### Update patient (ADMIN only)
 PUT http://localhost:8080/patients/1
 Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
+Authorization: Bearer {{admin_token}}
 
 {
   "first_name": "Ivan",
   "last_name": "Petrinko",
   "age": 36,
-  "diagnosis": "Odrazh"
+  "diagnosis": "Recovered"
 }
 
-### Delete patient
-DELETE http://localhost:8080/patients/3
-X-API-Key: my-secret-api-key-12345
-
-### Test without API key (should fail)
-GET http://localhost:8080/patients
-
-### Test with wrong API key (should fail)
-GET http://localhost:8080/patients
-X-API-Key: wrong-key
+### Delete patient (ADMIN only)
+DELETE http://localhost:8080/patients/1
+Authorization: Bearer {{admin_token}}
 
 ###############################################
-# DOCTORS 
+# PATIENTS - READER ACCESS
 ###############################################
 
-### Get all doctors
+### Get all patients (READER - allowed)
+GET http://localhost:8080/patients
+Authorization: Bearer {{reader_token}}
+
+### Get patient by ID (READER - allowed)
+GET http://localhost:8080/patients/1
+Authorization: Bearer {{reader_token}}
+
+### Try to create patient (READER - FORBIDDEN)
+POST http://localhost:8080/patients
+Content-Type: application/json
+Authorization: Bearer {{reader_token}}
+
+{
+  "first_name": "Test",
+  "last_name": "User",
+  "age": 30,
+  "diagnosis": "Test"
+}
+
+### Try to update patient (READER - FORBIDDEN)
+PUT http://localhost:8080/patients/1
+Content-Type: application/json
+Authorization: Bearer {{reader_token}}
+
+{
+  "first_name": "Test",
+  "last_name": "Update",
+  "age": 31,
+  "diagnosis": "Test"
+}
+
+### Try to delete patient (READER - FORBIDDEN)
+DELETE http://localhost:8080/patients/1
+Authorization: Bearer {{reader_token}}
+
+###############################################
+# DOCTORS - ADMIN ACCESS
+###############################################
+
+### Get all doctors (ADMIN)
 GET http://localhost:8080/doctors
-X-API-Key: my-secret-api-key-12345
+Authorization: Bearer {{admin_token}}
 
-### Get doctors by specialization
-GET http://localhost:8080/doctors?specialization=cardiologist
-X-API-Key: my-secret-api-key-12345
-
-### Get doctors with minimum experience
-GET http://localhost:8080/doctors?min_experience=10
-X-API-Key: my-secret-api-key-12345
-
-### Get doctors with exact experience
-GET http://localhost:8080/doctors?experience=5
-X-API-Key: my-secret-api-key-12345
-
-### Get doctors by last name
-GET http://localhost:8080/doctors?last_name=Kovalenko
-X-API-Key: my-secret-api-key-12345
-
-### Get doctor by ID
+### Get doctor by ID (ADMIN)
 GET http://localhost:8080/doctors/1
-X-API-Key: my-secret-api-key-12345
+Authorization: Bearer {{admin_token}}
 
-### Create new doctor
+### Get doctors with filter (ADMIN)
+GET http://localhost:8080/doctors?specialization=cardiologist
+Authorization: Bearer {{admin_token}}
+
+### Create new doctor (ADMIN only)
 POST http://localhost:8080/doctors
 Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
+Authorization: Bearer {{admin_token}}
 
 {
   "first_name": "Olena",
@@ -128,46 +170,10 @@ X-API-Key: my-secret-api-key-12345
   "experience": 10
 }
 
-### Create new doctor
-POST http://localhost:8080/doctors
-Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
-
-{
-  "first_name": "Andriy",
-  "last_name": "Melnyk",
-  "specialization": "Therapist",
-  "experience": 5
-}
-
-### Create new doctor
-POST http://localhost:8080/doctors
-Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
-
-{
-  "first_name": "Viktor",
-  "last_name": "Bondarenko",
-  "specialization": "Surgeon",
-  "experience": 15
-}
-
-### Create new doctor
-POST http://localhost:8080/doctors
-Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
-
-{
-  "first_name": "Natalia",
-  "last_name": "Ivanchenko",
-  "specialization": "Pediatrician",
-  "experience": 8
-}
-
-### Update doctor
+### Update doctor (ADMIN only)
 PUT http://localhost:8080/doctors/1
 Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
+Authorization: Bearer {{admin_token}}
 
 {
   "first_name": "Olena",
@@ -176,120 +182,108 @@ X-API-Key: my-secret-api-key-12345
   "experience": 11
 }
 
-### Delete doctor
-DELETE http://localhost:8080/doctors/4
-X-API-Key: my-secret-api-key-12345
+### Delete doctor (ADMIN only)
+DELETE http://localhost:8080/doctors/1
+Authorization: Bearer {{admin_token}}
 
 ###############################################
-# APPOINTMENTS
+# DOCTORS - READER ACCESS
 ###############################################
 
-### Get all appointments
+### Get all doctors (READER - allowed)
+GET http://localhost:8080/doctors
+Authorization: Bearer {{reader_token}}
+
+### Try to create doctor (READER - FORBIDDEN)
+POST http://localhost:8080/doctors
+Content-Type: application/json
+Authorization: Bearer {{reader_token}}
+
+{
+  "first_name": "Test",
+  "last_name": "Doctor",
+  "specialization": "Test",
+  "experience": 5
+}
+
+###############################################
+# APPOINTMENTS - ADMIN ACCESS
+###############################################
+
+### Get all appointments (ADMIN)
 GET http://localhost:8080/appointments
-X-API-Key: my-secret-api-key-12345
+Authorization: Bearer {{admin_token}}
 
-### Get appointments by patient ID
-GET http://localhost:8080/appointments?patient_id=1
-X-API-Key: my-secret-api-key-12345
-
-### Get appointments by doctor ID
-GET http://localhost:8080/appointments?doctor_id=2
-X-API-Key: my-secret-api-key-12345
-
-### Get appointments by date
-GET http://localhost:8080/appointments?date=2025-10-15
-X-API-Key: my-secret-api-key-12345
-
-### Get appointments by status
-GET http://localhost:8080/appointments?status=Scheduled
-X-API-Key: my-secret-api-key-12345
-
-### Get appointments with multiple filters
-GET http://localhost:8080/appointments?patient_id=1&status=Scheduled
-X-API-Key: my-secret-api-key-12345
-
-### Get appointment by ID
+### Get appointment by ID (ADMIN)
 GET http://localhost:8080/appointments/1
-X-API-Key: my-secret-api-key-12345
+Authorization: Bearer {{admin_token}}
 
-### Create new appointment
+### Get appointments with filter (ADMIN)
+GET http://localhost:8080/appointments?status=Scheduled
+Authorization: Bearer {{admin_token}}
+
+### Create new appointment (ADMIN only)
 POST http://localhost:8080/appointments
 Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
+Authorization: Bearer {{admin_token}}
 
 {
   "patient_id": 1,
   "doctor_id": 1,
-  "date": "2025-10-15",
+  "date": "2025-10-20",
   "time": "10:00",
   "status": "Scheduled"
 }
 
-### Create new appointment
-POST http://localhost:8080/appointments
-Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
-
-{
-  "patient_id": 2,
-  "doctor_id": 2,
-  "date": "2025-10-15",
-  "time": "11:30",
-  "status": "Scheduled"
-}
-
-### Create new appointment
-POST http://localhost:8080/appointments
-Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
-
-{
-  "patient_id": 3,
-  "doctor_id": 4,
-  "date": "2025-10-16",
-  "time": "09:00",
-  "status": "Scheduled"
-}
-
-### Create new appointment
-POST http://localhost:8080/appointments
-Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
-
-{
-  "patient_id": 1,
-  "doctor_id": 2,
-  "date": "2025-10-20",
-  "time": "14:00",
-  "status": "Scheduled"
-}
-
-### Update appointment
+### Update appointment (ADMIN only)
 PUT http://localhost:8080/appointments/1
 Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
+Authorization: Bearer {{admin_token}}
 
 {
   "patient_id": 1,
   "doctor_id": 1,
-  "date": "2025-10-15",
+  "date": "2025-10-20",
   "time": "10:00",
-  "status": "Finished"
+  "status": "Completed"
 }
 
-### Update appointment
-PUT http://localhost:8080/appointments/2
+### Delete appointment (ADMIN only)
+DELETE http://localhost:8080/appointments/1
+Authorization: Bearer {{admin_token}}
+
+###############################################
+# APPOINTMENTS - READER ACCESS
+###############################################
+
+### Get all appointments (READER - allowed)
+GET http://localhost:8080/appointments
+Authorization: Bearer {{reader_token}}
+
+### Try to create appointment (READER - FORBIDDEN)
+POST http://localhost:8080/appointments
 Content-Type: application/json
-X-API-Key: my-secret-api-key-12345
+Authorization: Bearer {{reader_token}}
 
 {
-  "patient_id": 2,
-  "doctor_id": 2,
-  "date": "2025-10-15",
-  "time": "15:00",
-  "status": "Rescheduled"
+  "patient_id": 1,
+  "doctor_id": 1,
+  "date": "2025-10-21",
+  "time": "11:00",
+  "status": "Scheduled"
 }
 
-### Delete appointment
-DELETE http://localhost:8080/appointments/4
-X-API-Key: my-secret-api-key-12345
+###############################################
+# ERROR CASES 
+###############################################
+
+### Request without token
+GET http://localhost:8080/patients
+
+### Request with invalid token
+GET http://localhost:8080/patients
+Authorization: Bearer invalid_token_here
+
+### Request with expired/malformed token
+GET http://localhost:8080/patients
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.invalid.signature
