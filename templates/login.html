@@ -1,0 +1,59 @@
+{{define "content"}}
+<div class="header">
+    <h1>🏥 Hospital Management System</h1>
+</div>
+
+<div class="content" style="max-width: 500px; margin: 40px auto;">
+    <h2 style="text-align: center; margin-bottom: 30px;">Login</h2>
+    
+    {{if .Error}}
+        {{if eq .Error "unauthorized"}}
+            <div class="alert alert-error">Please log in to access this page</div>
+        {{else if eq .Error "invalid_credentials"}}
+            <div class="alert alert-error">Invalid username or password</div>
+        {{else if eq .Error "session_error"}}
+            <div class="alert alert-error">Session error. Please try again</div>
+        {{else}}
+            <div class="alert alert-error">{{.Error}}</div>
+        {{end}}
+    {{end}}
+    
+    {{if .Success}}
+        {{if eq .Success "logged_out"}}
+            <div class="alert alert-success">Successfully logged out</div>
+        {{end}}
+    {{end}}
+    
+    <form method="POST" action="/login" style="background: #f9f9f9; padding: 30px; border-radius: 8px;">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required autocomplete="username">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required autocomplete="current-password">
+        </div>
+        
+        <button type="submit" class="btn" style="width: 100%;">Login</button>
+    </form>
+    
+    <div style="margin-top: 30px; padding: 20px; background: #f0f0f0; border-radius: 8px;">
+        <h3 style="margin-bottom: 15px;">Test Accounts:</h3>
+        <div style="display: grid; gap: 10px;">
+            <div style="padding: 10px; background: white; border-radius: 4px;">
+                <strong>Admin:</strong> admin / admin123 <span class="badge admin" style="margin-left: 10px;">Full Access</span>
+            </div>
+            <div style="padding: 10px; background: white; border-radius: 4px;">
+                <strong>Reader:</strong> reader / reader123 <span class="badge reader" style="margin-left: 10px;">Read-Only</span>
+            </div>
+            <div style="padding: 10px; background: white; border-radius: 4px;">
+                <strong>Doctor:</strong> doctor / doctor123 <span class="badge admin" style="margin-left: 10px;">Full Access</span>
+            </div>
+            <div style="padding: 10px; background: white; border-radius: 4px;">
+                <strong>Viewer:</strong> viewer / viewer123 <span class="badge reader" style="margin-left: 10px;">Read-Only</span>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

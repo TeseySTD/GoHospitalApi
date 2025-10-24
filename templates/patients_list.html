@@ -1,0 +1,105 @@
+{{define "content"}}
+<div class="header">
+    <h1>🏥 Hospital Management System</h1>
+    <div class="user-info">
+        <span>{{.Username}}</span>
+        <span class="badge {{if .IsAdmin}}admin{{else}}reader{{end}}">{{.Role}}</span>
+        <a href="/logout" class="btn btn-secondary">Logout</a>
+    </div>
+</div>
+
+<nav>
+    <a href="/">Home</a>
+    <a href="/patients" style="font-weight: bold;">Patients</a>
+    <a href="/doctors">Doctors</a>
+    <a href="/appointments">Appointments</a>
+</nav>
+
+<div class="content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>👥 Patients</h2>
+        {{if .IsAdmin}}
+            <a href="/patients/create" class="btn">+ Add New Patient</a>
+        {{end}}
+    </div>
+    
+    {{if .Success}}
+        {{if eq .Success "created"}}
+            <div class="alert alert-success">✓ Patient created successfully!</div>
+        {{else if eq .Success "updated"}}
+            <div class="alert alert-success">✓ Patient updated successfully!</div>
+        {{else if eq .Success "deleted"}}
+            <div class="alert alert-success">✓ Patient deleted successfully!</div>
+        {{end}}
+    {{end}}
+    
+    {{if .Error}}
+        <div class="alert alert-error">{{.Error}}</div>
+    {{end}}
+    
+    <!-- Filter Form -->
+    <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h3 style="margin-bottom: 15px;">🔍 Filter Patients</h3>
+        <form method="GET" action="/patients">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="first_name">First Name:</label>
+                    <input type="text" id="first_name" name="first_name" placeholder="Enter first name">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="last_name">Last Name:</label>
+                    <input type="text" id="last_name" name="last_name" placeholder="Enter last name">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="diagnosis">Diagnosis:</label>
+                    <input type="text" id="diagnosis" name="diagnosis" placeholder="Enter diagnosis">
+                </div>
+            </div>
+            <div style="margin-top: 15px;">
+                <button type="submit" class="btn">Apply Filter</button>
+                <a href="/patients" class="btn btn-secondary" style="margin-left: 10px;">Clear</a>
+            </div>
+        </form>
+    </div>
+    
+    {{if .Patients}}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Age</th>
+                    <th>Diagnosis</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Patients}}
+                <tr>
+                    <td>{{.ID}}</td>
+                    <td>{{.FirstName}}</td>
+                    <td>{{.LastName}}</td>
+                    <td>{{.Age}}</td>
+                    <td>{{.Diagnosis}}</td>
+                    <td>
+                        <a href="/patients/view?id={{.ID}}" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">View</a>
+                        {{if $.IsAdmin}}
+                            <a href="/patients/edit?id={{.ID}}" class="btn" style="padding: 5px 10px; font-size: 12px;">Edit</a>
+                            <a href="/patients/delete?id={{.ID}}" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="return confirm('Are you sure you want to delete this patient?')">Delete</a>
+                        {{end}}
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    {{else}}
+        <div style="text-align: center; padding: 40px; color: #666;">
+            <p>No patients found.</p>
+            {{if .IsAdmin}}
+                <a href="/patients/create" class="btn" style="margin-top: 20px;">Add First Patient</a>
+            {{end}}
+        </div>
+    {{end}}
+</div>
+{{end}}

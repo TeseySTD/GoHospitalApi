@@ -1,0 +1,55 @@
+{{define "content"}}
+<div class="header">
+    <h1>🏥 Hospital Management System</h1>
+    <div class="user-info">
+        <span>{{.Username}}</span>
+        <span class="badge admin">{{.Role}}</span>
+        <a href="/logout" class="btn btn-secondary">Logout</a>
+    </div>
+</div>
+
+<nav>
+    <a href="/">Home</a>
+    <a href="/patients">Patients</a>
+    <a href="/doctors">Doctors</a>
+    <a href="/appointments">Appointments</a>
+</nav>
+
+<div class="content">
+    <h2>✏️ Edit Doctor</h2>
+    
+    {{if .Doctor}}
+        <form method="POST" action="/doctors/edit" style="max-width: 600px; margin-top: 30px;">
+            <input type="hidden" name="id" value="{{.Doctor.ID}}">
+            
+            <div class="form-group">
+                <label for="first_name">First Name: *</label>
+                <input type="text" id="first_name" name="first_name" value="{{.Doctor.FirstName}}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="last_name">Last Name: *</label>
+                <input type="text" id="last_name" name="last_name" value="{{.Doctor.LastName}}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="specialization">Specialization: *</label>
+                <input type="text" id="specialization" name="specialization" value="{{.Doctor.Specialization}}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="experience">Years of Experience: *</label>
+                <input type="number" id="experience" name="experience" value="{{.Doctor.Experience}}" min="0" max="70" required>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn">Update Doctor</button>
+                <a href="/doctors" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    {{else}}
+        <div class="alert alert-error">Doctor not found</div>
+        <a href="/doctors" class="btn">Back to Doctors</a>
+    {{end}}
+</div>
+{{end}}
